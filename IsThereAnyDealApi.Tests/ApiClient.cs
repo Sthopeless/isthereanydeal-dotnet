@@ -22,12 +22,13 @@ namespace IsThereAnyDeal.Api.Tests
         {
             try
             {
-                _apiKey = GetApiKeyFromConfig(); // Load API key from testsettings.json
+                // GetApiKeyFromConfig now handles both env vars and the file
+                _apiKey = GetApiKeyFromConfig();
                 _client = new IsThereAnyDealApiClient(_apiKey);
             }
             catch (InvalidOperationException ex)
             {
-                // Handle case where file/key isn't found
+                // Handle case where API key isn't found in either env var or file
                 _apiKey = null;
                 _client = null;
                 _initializationErrorMessage = ex.Message; // Store error message
@@ -40,30 +41,44 @@ namespace IsThereAnyDeal.Api.Tests
             }
         }
 
-        // Helper method to get API key from testsettings.json
+        // Helper method to get API key from environment variable or testsettings.json
         private string GetApiKeyFromConfig()
         {
+            // Prioritize Environment Variable (commonly used in CI/CD)
+            string? apiKeyFromEnv = Environment.GetEnvironmentVariable("ITAD_API_KEY"); // Use the same name as your GitHub Secret
+            if (!string.IsNullOrWhiteSpace(apiKeyFromEnv))
+            {
+                Console.WriteLine("Using API Key from environment variable."); // Optional: for logging in CI
+                return apiKeyFromEnv;
+            }
+
+            // Fallback to JSON file (for local development)
+            Console.WriteLine("API Key environment variable not found, trying testsettings.json...");
             // Ensure your testsettings.json file has "Copy to Output Directory" set to "Copy if newer" or "Copy always"
             // in its file properties in Visual Studio / Rider, or configure your build process accordingly.
             var configPath = Path.Combine(AppContext.BaseDirectory, "testsettings.json");
 
             if (!File.Exists(configPath))
             {
-                 throw new InvalidOperationException($"Configuration file '{configPath}' not found. Create 'testsettings.json' in the test project root with your ITAD_API_KEY and ensure it's copied to the output directory.");
+                 // Now this error is more relevant for local setup if env var is also missing
+                 throw new InvalidOperationException($"Neither ITAD_API_KEY environment variable nor configuration file '{configPath}' found. Set the environment variable in CI or ensure 'testsettings.json' exists locally and is copied to output.");
             }
 
             var config = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory) // Ensures it finds the file during test run
-                .AddJsonFile("testsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("testsettings.json", optional: true, reloadOnChange: false) // Make optional: true as env var is primary now
                 .Build();
 
-            var apiKey = config["ITAD_API_KEY"]; // Access the key (key name in JSON file)
+            var apiKeyFromJson = config["ITAD_API_KEY"]; // Access the key (key name in JSON file)
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (string.IsNullOrWhiteSpace(apiKeyFromJson))
             {
-                throw new InvalidOperationException("ITAD_API_KEY not found or empty in 'testsettings.json'.");
+                // This exception means env var was missing AND file was missing or key was empty in file
+                throw new InvalidOperationException("ITAD_API_KEY not found or empty in 'testsettings.json' and not set as environment variable.");
             }
-            return apiKey;
+
+            Console.WriteLine("Using API Key from testsettings.json.");
+            return apiKeyFromJson;
         }
 
 
@@ -94,7 +109,7 @@ namespace IsThereAnyDeal.Api.Tests
         [Fact]
         public async Task LookupGameAsync_By_Title_Should_Work_With_ApiKey()
         {
-            // Skip test if client initialization failed
+            // Skip test if client initialization failed (API key couldn't be loaded)
             if (_client == null || _apiKey == null)
             {
                 // Using Assert.Skip is cleaner if available in your xUnit version
