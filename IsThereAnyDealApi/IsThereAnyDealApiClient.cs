@@ -18,8 +18,7 @@ namespace IsThereAnyDeal.Api
         private readonly IIsThereAnyDealApi _api; // Uses the interface now defined in IIsThereAnyDealApi.cs
         private readonly string? _apiKey; // Store the API key
 
-        // TODO: Add properties/methods for OAuth token management
-        private string? _accessToken; // Example placeholder for OAuth token
+        private string? _accessToken; // Placeholder for OAuth token
 
         public static JsonSerializerSettings DefaultJsonSerializerSettings = new JsonSerializerSettings()
         {
@@ -39,21 +38,17 @@ namespace IsThereAnyDeal.Api
         {
             _apiKey = apiKey;
 
-            // 1. Create and configure the HttpClient
             var httpClient = new HttpClient() {
                  BaseAddress = new Uri(apiBaseUrl)
                  // Optionally add default headers like User-Agent
                  // httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("YourApp/1.0 (contact@example.com)");
             };
 
-            // 2. Create the RestClient instance, passing the configured HttpClient
             var restClient = new RestClient(httpClient)
             {
-                // 3. Set the custom JsonSerializerSettings on the RestClient instance
                 JsonSerializerSettings = DefaultJsonSerializerSettings
             };
 
-            // 4. Create the typed API interface implementation from the configured RestClient
             _api = restClient.For<IIsThereAnyDealApi>();
         }
 
@@ -66,7 +61,7 @@ namespace IsThereAnyDeal.Api
             }
         }
 
-        // Helper method to get the Authorization header string (replace with real token management)
+        // Helper method to get the Authorization header string
         private string GetAuthorizationHeader()
         {
             if (string.IsNullOrWhiteSpace(_accessToken))
@@ -77,7 +72,6 @@ namespace IsThereAnyDeal.Api
         }
 
         // --- Public API Methods ---
-        // These methods call the corresponding methods defined in IIsThereAnyDealApi
 
         /// <summary>
         /// Gets information about shops.
@@ -86,8 +80,7 @@ namespace IsThereAnyDeal.Api
         /// <returns>A list of shops.</returns>
         public async Task<List<Shop>> GetShopsAsync(string country = "NL")
         {
-            // No API key needed for this endpoint per spec
-            // TODO: Add try/catch for ApiException
+            // No API key needed
             return await _api.GetShopsAsync(country);
         }
 
@@ -104,8 +97,6 @@ namespace IsThereAnyDeal.Api
             {
                 throw new ArgumentException("Either title or appid must be provided for game lookup.");
             }
-            // TODO: Add try/catch for ApiException
-            // Pass the stored _apiKey to the interface method where the [Query("key")] attribute is defined
             return await _api.LookupGameAsync(title, appid, _apiKey);
         }
 
@@ -118,7 +109,6 @@ namespace IsThereAnyDeal.Api
         {
             EnsureApiKey();
             if (titles == null || titles.Count == 0) return new Dictionary<string, string?>();
-            // TODO: Add try/catch for ApiException
             return await _api.LookupGameIdsByTitleAsync(titles, _apiKey);
         }
 
@@ -132,7 +122,6 @@ namespace IsThereAnyDeal.Api
         {
              EnsureApiKey();
              if (shopGameIds == null || shopGameIds.Count == 0) return new Dictionary<string, string?>();
-             // TODO: Add try/catch for ApiException
              return await _api.LookupGameIdsByShopIdAsync(shopId, shopGameIds, _apiKey);
         }
 
@@ -146,7 +135,6 @@ namespace IsThereAnyDeal.Api
         {
             EnsureApiKey();
             if (gameIds == null || gameIds.Count == 0) return new Dictionary<string, List<string>?>();
-            // TODO: Add try/catch for ApiException
             return await _api.LookupShopIdsByGameIdAsync(shopId, gameIds, _apiKey);
         }
 
@@ -160,13 +148,13 @@ namespace IsThereAnyDeal.Api
              EnsureApiKey();
              try
              {
-                 // Pass the stored _apiKey to the interface method
                  return await _api.GetGameInfoAsync(gameId, _apiKey);
              }
              catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
              {
                  return null;
              }
+             // Consider catching other specific API exceptions if needed
         }
 
         /// <summary>
@@ -178,7 +166,6 @@ namespace IsThereAnyDeal.Api
         public async Task<List<Game>> SearchGamesAsync(string title, int results = 20)
         {
             EnsureApiKey();
-            // TODO: Add try/catch for ApiException
             return await _api.SearchGamesAsync(title, results, _apiKey);
         }
 
@@ -202,7 +189,6 @@ namespace IsThereAnyDeal.Api
         {
             EnsureApiKey();
             if (gameIds == null || gameIds.Count == 0) return new List<GamePrices>();
-            // TODO: Add try/catch for ApiException
             return await _api.GetGamePricesAsync(gameIds, country, dealsOnly, vouchers, capacity, shops, _apiKey);
         }
 
@@ -222,7 +208,6 @@ namespace IsThereAnyDeal.Api
         {
             EnsureApiKey();
             if (gameIds == null || gameIds.Count == 0) return new GameOverviewResult(); // Return empty result
-            // TODO: Add try/catch for ApiException
             return await _api.GetGamesOverviewAsync(gameIds, country, shops, vouchers, _apiKey);
         }
 
@@ -236,7 +221,6 @@ namespace IsThereAnyDeal.Api
         public async Task<List<Bundle>> GetBundlesForGameAsync(string gameId, string country = "NL", bool expired = false)
         {
             EnsureApiKey();
-            // TODO: Add try/catch for ApiException
             return await _api.GetBundlesForGameAsync(gameId, country, expired, _apiKey);
         }
 
@@ -250,7 +234,6 @@ namespace IsThereAnyDeal.Api
         {
              EnsureApiKey();
              if (gameIds == null || gameIds.Count == 0) return new List<GameHistoricalLow>();
-             // TODO: Add try/catch for ApiException
              return await _api.GetHistoricalLowsAsync(gameIds, country, _apiKey);
         }
 
@@ -265,7 +248,6 @@ namespace IsThereAnyDeal.Api
         {
             EnsureApiKey();
             if (gameIds == null || gameIds.Count == 0) return new List<GameStoreLow>();
-            // TODO: Add try/catch for ApiException
             return await _api.GetStoreLowsAsync(gameIds, country, shops, _apiKey);
         }
 
@@ -280,7 +262,6 @@ namespace IsThereAnyDeal.Api
         public async Task<List<PriceHistoryPoint>> GetPriceHistoryAsync(string gameId, string country = "NL", int[]? shops = null, DateTimeOffset? since = null)
         {
             EnsureApiKey();
-            // TODO: Add try/catch for ApiException
             return await _api.GetPriceHistoryAsync(gameId, country, shops, since, _apiKey);
         }
 
@@ -294,7 +275,6 @@ namespace IsThereAnyDeal.Api
         {
              EnsureApiKey();
              if (gameIds == null || gameIds.Count == 0) return new List<GameSubscriptions>();
-             // TODO: Add try/catch for ApiException
              return await _api.GetGameSubscriptionsAsync(gameIds, country, _apiKey);
         }
 
@@ -321,12 +301,10 @@ namespace IsThereAnyDeal.Api
             string? filter = null)
         {
             EnsureApiKey();
-            // TODO: Add try/catch for ApiException
             return await _api.GetDealsListAsync(country, offset, limit, sort, nondeals, mature, shops, filter, _apiKey);
         }
 
         // --- OAuth Methods ---
-        // TODO: Implement proper OAuth flow and token management
 
         /// <summary>
         /// Sets the current OAuth access token for user-specific requests.
@@ -343,7 +321,6 @@ namespace IsThereAnyDeal.Api
         /// <returns>User info.</returns>
         public async Task<UserInfo> GetUserInfoAsync()
         {
-            // TODO: Add try/catch for ApiException (e.g., 401 Unauthorized)
             return await _api.GetUserInfoAsync(GetAuthorizationHeader());
         }
 
@@ -353,7 +330,6 @@ namespace IsThereAnyDeal.Api
         /// <returns>List of waitlisted games.</returns>
         public async Task<List<WaitlistGame>> GetWaitlistGamesAsync()
         {
-            // TODO: Add try/catch for ApiException
             return await _api.GetWaitlistGamesAsync(GetAuthorizationHeader());
         }
 
@@ -364,7 +340,6 @@ namespace IsThereAnyDeal.Api
         public async Task AddGamesToWaitlistAsync(List<string> gameIds)
         {
             if (gameIds == null || gameIds.Count == 0) return;
-            // TODO: Add try/catch for ApiException
             await _api.AddGamesToWaitlistAsync(gameIds, GetAuthorizationHeader());
         }
 
@@ -375,7 +350,6 @@ namespace IsThereAnyDeal.Api
         public async Task DeleteGamesFromWaitlistAsync(List<string> gameIds)
         {
              if (gameIds == null || gameIds.Count == 0) return;
-             // TODO: Add try/catch for ApiException
              await _api.DeleteGamesFromWaitlistAsync(gameIds, GetAuthorizationHeader());
         }
 
@@ -385,7 +359,6 @@ namespace IsThereAnyDeal.Api
         /// <returns>List of collection games.</returns>
         public async Task<List<CollectionGame>> GetCollectionGamesAsync()
         {
-            // TODO: Add try/catch for ApiException
             return await _api.GetCollectionGamesAsync(GetAuthorizationHeader());
         }
 
@@ -396,7 +369,6 @@ namespace IsThereAnyDeal.Api
         public async Task AddGamesToCollectionAsync(List<string> gameIds)
         {
              if (gameIds == null || gameIds.Count == 0) return;
-             // TODO: Add try/catch for ApiException
              await _api.AddGamesToCollectionAsync(gameIds, GetAuthorizationHeader());
         }
 
@@ -407,7 +379,6 @@ namespace IsThereAnyDeal.Api
         public async Task DeleteGamesFromCollectionAsync(List<string> gameIds)
         {
              if (gameIds == null || gameIds.Count == 0) return;
-             // TODO: Add try/catch for ApiException
              await _api.DeleteGamesFromCollectionAsync(gameIds, GetAuthorizationHeader());
         }
 
@@ -417,7 +388,6 @@ namespace IsThereAnyDeal.Api
         /// <returns>List of collection copies.</returns>
         public async Task<List<CollectionCopy>> GetCollectionCopiesAsync()
         {
-            // TODO: Add try/catch for ApiException
             return await _api.GetCollectionCopiesAsync(GetAuthorizationHeader());
         }
 
@@ -428,7 +398,6 @@ namespace IsThereAnyDeal.Api
         public async Task AddCollectionCopiesAsync(List<NewCollectionCopy> copies)
         {
              if (copies == null || copies.Count == 0) return;
-             // TODO: Add try/catch for ApiException
              await _api.AddCollectionCopiesAsync(copies, GetAuthorizationHeader());
         }
 
@@ -439,7 +408,6 @@ namespace IsThereAnyDeal.Api
         public async Task UpdateCollectionCopiesAsync(List<UpdateCollectionCopy> copies)
         {
              if (copies == null || copies.Count == 0) return;
-             // TODO: Add try/catch for ApiException
              await _api.UpdateCollectionCopiesAsync(copies, GetAuthorizationHeader());
         }
 
@@ -450,7 +418,6 @@ namespace IsThereAnyDeal.Api
         public async Task DeleteCollectionCopiesAsync(List<int> copyIds)
         {
              if (copyIds == null || copyIds.Count == 0) return;
-             // TODO: Add try/catch for ApiException
              await _api.DeleteCollectionCopiesAsync(copyIds, GetAuthorizationHeader());
         }
 
@@ -460,7 +427,6 @@ namespace IsThereAnyDeal.Api
         /// <returns>List of user notes.</returns>
         public async Task<List<UserNote>> GetUserNotesAsync()
         {
-            // TODO: Add try/catch for ApiException
              return await _api.GetUserNotesAsync(GetAuthorizationHeader());
         }
 
@@ -471,7 +437,6 @@ namespace IsThereAnyDeal.Api
         public async Task SetUserNotesAsync(List<UserNote> notes)
         {
             if (notes == null || notes.Count == 0) return;
-            // TODO: Add try/catch for ApiException
             await _api.SetUserNotesAsync(notes, GetAuthorizationHeader());
         }
 
@@ -482,7 +447,6 @@ namespace IsThereAnyDeal.Api
         public async Task DeleteUserNotesAsync(List<string> gameIds)
         {
              if (gameIds == null || gameIds.Count == 0) return;
-             // TODO: Add try/catch for ApiException
              await _api.DeleteUserNotesAsync(gameIds, GetAuthorizationHeader());
         }
 
@@ -492,11 +456,167 @@ namespace IsThereAnyDeal.Api
         /// <returns>List of notifications.</returns>
         public async Task<List<Notification>> GetNotificationsAsync()
         {
-            // TODO: Add try/catch for ApiException
              return await _api.GetNotificationsAsync(GetAuthorizationHeader());
         }
 
-        // Implement other notification methods...
+        // --- Start: Implemented TODOs ---
+
+        /// <summary>
+        /// Gets the detailed content of a specific waitlist notification. Requires OAuth.
+        /// </summary>
+        /// <param name="notificationId">The ID (UUID) of the notification.</param>
+        /// <returns>Detailed notification information.</returns>
+        public async Task<WaitlistNotificationDetail> GetWaitlistNotificationDetailAsync(string notificationId)
+        {
+            if (string.IsNullOrWhiteSpace(notificationId))
+                throw new ArgumentException("Notification ID cannot be empty.", nameof(notificationId));
+
+            return await _api.GetWaitlistNotificationDetailAsync(notificationId, GetAuthorizationHeader());
+        }
+
+        /// <summary>
+        /// Marks a specific notification as read. Requires OAuth.
+        /// </summary>
+        /// <param name="notificationId">The ID (UUID) of the notification to mark as read.</param>
+        public async Task MarkNotificationReadAsync(string notificationId)
+        {
+             if (string.IsNullOrWhiteSpace(notificationId))
+                throw new ArgumentException("Notification ID cannot be empty.", nameof(notificationId));
+
+            await _api.MarkNotificationReadAsync(notificationId, GetAuthorizationHeader());
+        }
+
+        /// <summary>
+        /// Marks all notifications for the user as read. Requires OAuth.
+        /// </summary>
+        public async Task MarkAllNotificationsReadAsync()
+        {
+            await _api.MarkAllNotificationsReadAsync(GetAuthorizationHeader());
+        }
+
+        /// <summary>
+        /// Links a profile to the user's ITAD account. Requires OAuth.
+        /// </summary>
+        /// <param name="profile">The profile details to link.</param>
+        /// <returns>The response containing the profile token.</returns>
+        public async Task<LinkProfileResponse> LinkProfileAsync(Profile profile)
+        {
+            if (profile == null) throw new ArgumentNullException(nameof(profile));
+            // Add more specific validation if needed (e.g., non-empty AccountId/AccountName)
+            return await _api.LinkProfileAsync(profile, GetAuthorizationHeader());
+        }
+
+        /// <summary>
+        /// Unlinks a profile from the user's ITAD account. Requires OAuth and the Profile Token.
+        /// </summary>
+        /// <param name="profileToken">The profile token obtained via the link endpoint.</param>
+        public async Task UnlinkProfileAsync(string profileToken)
+        {
+            if (string.IsNullOrWhiteSpace(profileToken))
+                throw new ArgumentException("Profile token cannot be empty.", nameof(profileToken));
+
+            await _api.UnlinkProfileAsync(GetAuthorizationHeader(), profileToken);
+        }
+
+        /// <summary>
+        /// Gets the user's collection categories/groups. Requires OAuth.
+        /// </summary>
+        /// <returns>List of collection groups.</returns>
+        public async Task<List<CollectionGroup>> GetCollectionGroupsAsync()
+        {
+            return await _api.GetCollectionGroupsAsync(GetAuthorizationHeader());
+        }
+
+        /// <summary>
+        /// Creates a new collection category/group. Requires OAuth.
+        /// </summary>
+        /// <param name="group">The details of the group to create.</param>
+        /// <returns>The newly created collection group with its ID.</returns>
+        public async Task<CollectionGroup> AddCollectionGroupAsync(NewCollectionGroup group)
+        {
+            if (group == null) throw new ArgumentNullException(nameof(group));
+            if (string.IsNullOrWhiteSpace(group.Title))
+                 throw new ArgumentException("Group title cannot be empty.", $"{nameof(group)}.{nameof(group.Title)}");
+
+            return await _api.AddCollectionGroupAsync(group, GetAuthorizationHeader());
+        }
+
+        /// <summary>
+        /// Updates one or more collection categories/groups. Requires OAuth.
+        /// </summary>
+        /// <param name="groups">List of groups to update with their changes.</param>
+        /// <returns>The updated list of all collection groups.</returns>
+        public async Task<List<CollectionGroup>> UpdateCollectionGroupsAsync(List<UpdateCollectionGroup> groups)
+        {
+             if (groups == null || groups.Count == 0) return await GetCollectionGroupsAsync(); // Or return empty list? Decide behavior.
+             // Add validation for individual group updates if needed
+             return await _api.UpdateCollectionGroupsAsync(groups, GetAuthorizationHeader());
+        }
+
+        /// <summary>
+        /// Deletes collection categories/groups. Requires OAuth.
+        /// </summary>
+        /// <param name="groupIds">List of group IDs to delete.</param>
+        public async Task DeleteCollectionGroupsAsync(List<int> groupIds)
+        {
+             if (groupIds == null || groupIds.Count == 0) return;
+             await _api.DeleteCollectionGroupsAsync(groupIds, GetAuthorizationHeader());
+        }
+
+        /// <summary>
+        /// Gets waitlist statistics for a specific game. Requires API Key.
+        /// </summary>
+        /// <param name="gameId">ITAD Game ID.</param>
+        /// <param name="country">Country code for price context.</param>
+        /// <param name="bucketPrice">Price bucket size for stats.</param>
+        /// <param name="bucketCut">Cut bucket size for stats.</param>
+        /// <returns>Waitlist statistics.</returns>
+        public async Task<WaitlistStats> GetWaitlistStatsAsync(string gameId, string country = "US", int bucketPrice = 5, int bucketCut = 5)
+        {
+            EnsureApiKey();
+             if (string.IsNullOrWhiteSpace(gameId))
+                throw new ArgumentException("Game ID cannot be empty.", nameof(gameId));
+
+            return await _api.GetWaitlistStatsAsync(gameId, country, bucketPrice, bucketCut, _apiKey);
+        }
+
+         /// <summary>
+        /// Gets a ranked list of the most waitlisted games. Requires API Key.
+        /// </summary>
+        /// <param name="offset">Pagination offset.</param>
+        /// <param name="limit">Pagination limit.</param>
+        /// <returns>List of ranked games.</returns>
+        public async Task<List<RankedGame>> GetMostWaitlistedGamesAsync(int offset = 0, int limit = 20)
+        {
+            EnsureApiKey();
+            return await _api.GetMostWaitlistedGamesAsync(offset, limit, _apiKey);
+        }
+
+        /// <summary>
+        /// Gets a ranked list of the most collected games. Requires API Key.
+        /// </summary>
+        /// <param name="offset">Pagination offset.</param>
+        /// <param name="limit">Pagination limit.</param>
+        /// <returns>List of ranked games.</returns>
+        public async Task<List<RankedGame>> GetMostCollectedGamesAsync(int offset = 0, int limit = 20)
+        {
+            EnsureApiKey();
+            return await _api.GetMostCollectedGamesAsync(offset, limit, _apiKey);
+        }
+
+        /// <summary>
+        /// Gets a ranked list of the most popular games (Waitlisted + Collected). Requires API Key.
+        /// </summary>
+        /// <param name="offset">Pagination offset.</param>
+        /// <param name="limit">Pagination limit.</param>
+        /// <returns>List of ranked games.</returns>
+        public async Task<List<RankedGame>> GetMostPopularGamesAsync(int offset = 0, int limit = 20)
+        {
+            EnsureApiKey();
+            return await _api.GetMostPopularGamesAsync(offset, limit, _apiKey);
+        }
+
+        // --- End: Implemented TODOs ---
 
         // --- Sync Methods ---
         // These require both OAuth and a Profile Token
@@ -509,9 +629,10 @@ namespace IsThereAnyDeal.Api
         /// <returns>Sync result.</returns>
         public async Task<SyncResult> SyncWaitlistAsync(string profileToken, List<WaitlistSyncEntry> entries)
         {
-            // TODO: Add validation for profileToken
+            if (string.IsNullOrWhiteSpace(profileToken))
+                 throw new ArgumentException("Profile token cannot be empty.", nameof(profileToken));
             if (entries == null || entries.Count == 0) return new SyncResult();
-            // TODO: Add try/catch for ApiException
+            // Add validation for entries if needed
             return await _api.SyncWaitlistAsync(entries, GetAuthorizationHeader(), profileToken);
         }
 
@@ -523,13 +644,13 @@ namespace IsThereAnyDeal.Api
         /// <returns>Sync result.</returns>
         public async Task<SyncResult> SyncCollectionAsync(string profileToken, List<CollectionSyncEntry> entries)
         {
-            // TODO: Add validation for profileToken
+            if (string.IsNullOrWhiteSpace(profileToken))
+                 throw new ArgumentException("Profile token cannot be empty.", nameof(profileToken));
             if (entries == null || entries.Count == 0) return new SyncResult(); // Return empty result for no input
-            // TODO: Add try/catch for ApiException
+            // Add validation for entries if needed
             return await _api.SyncCollectionAsync(entries, GetAuthorizationHeader(), profileToken);
         }
 
-        // TODO: Add client methods for Profiles, Stats, remaining Notification endpoints etc.
         // Remember to add error handling (try/catch ApiException), parameter validation,
         // and implement proper OAuth token management (refreshing tokens etc.).
     }

@@ -12,9 +12,6 @@ namespace IsThereAnyDeal.Api
     [Header("Accept", "application/json")]
     public interface IIsThereAnyDealApi
     {
-        // Note: BaseAddress property removed as it's handled by HttpClient instance.
-        // Note: ApiKey property removed as it's passed via [Query("key")] on methods.
-
         // --- Service ---
         [Get("/service/shops/v1")]
         Task<List<Shop>> GetShopsAsync([Query] string country = "NL");
@@ -105,7 +102,6 @@ namespace IsThereAnyDeal.Api
         [Get("/collection/games/v1")]
         Task<List<CollectionGame>> GetCollectionGamesAsync([Header("Authorization")] string authorization);
 
-        // TODO: Add missing signatures
         [Put("/collection/games/v1")]
         Task AddGamesToCollectionAsync([Body] List<string> gameIds, [Header("Authorization")] string authorization);
 
@@ -124,7 +120,19 @@ namespace IsThereAnyDeal.Api
         [Delete("/collection/copies/v1")]
         Task DeleteCollectionCopiesAsync([Body] List<int> copyIds, [Header("Authorization")] string authorization);
 
-        // TODO: Add Collection Group endpoints
+        // --- Collection Groups (OAuth Required) --- NEWLY ADDED ---
+        [Get("/collection/groups/v1")]
+        Task<List<CollectionGroup>> GetCollectionGroupsAsync([Header("Authorization")] string authorization);
+
+        [Post("/collection/groups/v1")]
+        Task<CollectionGroup> AddCollectionGroupAsync([Body] NewCollectionGroup group, [Header("Authorization")] string authorization);
+
+        [Patch("/collection/groups/v1")]
+        Task<List<CollectionGroup>> UpdateCollectionGroupsAsync([Body] List<UpdateCollectionGroup> groups, [Header("Authorization")] string authorization);
+
+        [Delete("/collection/groups/v1")]
+        Task DeleteCollectionGroupsAsync([Body] List<int> groupIds, [Header("Authorization")] string authorization);
+        // --- END NEW Collection Groups ---
 
         // --- User Notes (OAuth Required) ---
         [Get("/user/notes/v1")]
@@ -140,16 +148,44 @@ namespace IsThereAnyDeal.Api
         [Get("/notifications/v1")]
         Task<List<Notification>> GetNotificationsAsync([Header("Authorization")] string authorization);
 
-        // TODO: Add remaining Notification endpoints (/waitlist/v1 GET, /read/v1 PUT, /read/all/v1 PUT)
+        // --- NEWLY ADDED Notification Endpoints ---
+        [Get("/notifications/waitlist/v1")]
+        Task<WaitlistNotificationDetail> GetWaitlistNotificationDetailAsync([Query("id")] string notificationId, [Header("Authorization")] string authorization);
+
+        [Put("/notifications/read/v1")]
+        Task MarkNotificationReadAsync([Query("id")] string notificationId, [Header("Authorization")] string authorization);
+
+        [Put("/notifications/read/all/v1")]
+        Task MarkAllNotificationsReadAsync([Header("Authorization")] string authorization);
+        // --- END NEW Notification Endpoints ---
+
+        // --- Profiles (OAuth Required) --- NEWLY ADDED ---
+        [Put("/profiles/link/v1")]
+        Task<LinkProfileResponse> LinkProfileAsync([Body] Profile profile, [Header("Authorization")] string authorization);
+
+        [Delete("/profiles/link/v1")]
+        Task UnlinkProfileAsync([Header("Authorization")] string authorization, [Header("ITAD-Profile")] string profileToken);
+        // --- END NEW Profiles ---
 
         // --- Sync (OAuth + Profile Token Required) ---
-        // These require a profile token in the "ITAD-Profile" header, separate from OAuth
         [Put("/profiles/sync/waitlist/v1")]
         Task<SyncResult> SyncWaitlistAsync([Body] List<WaitlistSyncEntry> entries, [Header("Authorization")] string authorization, [Header("ITAD-Profile")] string profileToken);
 
         [Put("/profiles/sync/collection/v1")]
         Task<SyncResult> SyncCollectionAsync([Body] List<CollectionSyncEntry> entries, [Header("Authorization")] string authorization, [Header("ITAD-Profile")] string profileToken);
 
-        // TODO: Add missing endpoint definitions for Profiles, Stats, etc.
+        // --- Stats (API Key Required) --- NEWLY ADDED ---
+        [Get("/stats/waitlist/v1")]
+        Task<WaitlistStats> GetWaitlistStatsAsync([Query("id")] string gameId, [Query] string country = "US", [Query] int bucket_price = 5, [Query] int bucket_cut = 5, [Query("key")] string? apiKey = null);
+
+        [Get("/stats/most-waitlisted/v1")]
+        Task<List<RankedGame>> GetMostWaitlistedGamesAsync([Query] int offset = 0, [Query] int limit = 20, [Query("key")] string? apiKey = null);
+
+        [Get("/stats/most-collected/v1")]
+        Task<List<RankedGame>> GetMostCollectedGamesAsync([Query] int offset = 0, [Query] int limit = 20, [Query("key")] string? apiKey = null);
+
+        [Get("/stats/most-popular/v1")]
+        Task<List<RankedGame>> GetMostPopularGamesAsync([Query] int offset = 0, [Query] int limit = 20, [Query("key")] string? apiKey = null);
+        // --- END NEW Stats ---
     }
 }
