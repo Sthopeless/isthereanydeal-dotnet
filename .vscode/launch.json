@@ -19,6 +19,17 @@
              }
         },
         {
+            "name": "Test",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/IsThereAnyDealApi.Tests/bin/Debug/net6.0/IsThereAnyDealApi.Tests.dll", // Adjust net6.0 if needed
+            "args": [],
+            "cwd": "${workspaceFolder}/IsThereAnyDealApi.Tests",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"

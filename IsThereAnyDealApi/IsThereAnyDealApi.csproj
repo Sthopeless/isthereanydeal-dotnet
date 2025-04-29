@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
 
-    <PackageId>IsThereAnyDealApi</PackageId> <Version>1.0.1</Version> <Authors>Sthope</Authors>
+    <PackageId>IsThereAnyDealApi</PackageId> <Version>1.0.2</Version> <Authors>Sthope</Authors>
     <Company>Sthope</Company>
     <Product>IsThereAnyDeal API Client</Product>
     <Description>A .NET client library for interacting with the IsThereAnyDeal API (v2). Provides access to game lookups, price information, deals, bundles, user waitlists, collections, and more. See project URL for documentation and examples.</Description>

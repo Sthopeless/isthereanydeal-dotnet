@@ -159,7 +159,7 @@ This project aims to follow Semantic Versioning (SemVer).
 3.  **Define Redirect URI:** In `IsThereAnyDealApi.ManualTester/Program.cs`, update the `YourRedirectUri` constant to match the URI you registered with ITAD (e.g., `http://localhost:1234/callback`).
 4.  Build the solution:
     ```bash
-    dotnet build IsThereAnyDeal.sln
+    dotnet build IsThereAnyDealApi.sln
     ```
 5.  Run the Manual Tester (optional):
     ```bash

@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/IsThereAnyDeal.sln",
+                "${workspaceFolder}/IsThereAnyDealApi.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -18,12 +18,40 @@
             }
         },
         {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/IsThereAnyDealApi.sln", // Test the entire solution
+                // "${workspaceFolder}/IsThereAnyDealApi.Tests/IsThereAnyDealApi.Tests.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "watch-test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "test"
+            ],
+            "problemMatcher": "$msCompile",
+            "isBackground": true
+        },
+        {
             "label": "clean",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/IsThereAnyDeal.sln",
+                "${workspaceFolder}/IsThereAnyDealApi.sln",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
@@ -92,16 +120,14 @@
             "problemMatcher": []
         },
         {
-            // --- Helper Task: Push Package to NuGet ---
            "label": "Push NuGet Package (IsThereAnyDealApi)",
-           "type": "shell", // Keep as shell to execute PowerShell commands
-           "command": "powershell", // Explicitly use PowerShell
+           "type": "shell",
+           "command": "powershell",
            "args": [
                "-Command",
-               "$nupkgPath = (Get-ChildItem -Path '${workspaceFolder}/IsThereAnyDealApi/bin/Release' -Filter *.nupkg | Select-Object -First 1).FullName; if ($null -ne $nupkgPath) { dotnet nuget push $nupkgPath --source https://api.nuget.org/v3/index.json --api-key '${input:nugetKey}' --skip-duplicate } else { Write-Error 'Failed to find .nupkg file in bin/Release' }"
-           ],
-           "problemMatcher": [], // No standard problem matcher for this script
-           // No cwd needed here as we use ${workspaceFolder} in the PowerShell command
+               "$nupkgPath = (Get-ChildItem -Path '${workspaceFolder}/IsThereAnyDealApi/bin/Release' -Filter *.nupkg | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName; if ($null -ne $nupkgPath) { dotnet nuget push $nupkgPath --source https://api.nuget.org/v3/index.json --api-key '${input:nugetKey}' --skip-duplicate } else { Write-Error 'Failed to find .nupkg file in bin/Release' }"
+            ],
+           "problemMatcher": [],
        }
     ],
     "inputs": [

@@ -1,0 +1,31 @@
+name: .NET Build and Test
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore IsThereAnyDealApi.sln
+
+      - name: Build Solution
+        run: dotnet build IsThereAnyDealApi.sln --configuration Release --no-restore
+
+      - name: Run Tests
+        run: dotnet test IsThereAnyDealApi.sln --configuration Release --no-build --verbosity normal
+        env:
+          ITAD_API_KEY: ${{ secrets.ITAD_API_KEY }}
+          ITAD_CLIENT_ID: ${{ secrets.ITAD_CLIENT_ID }}
+          ITAD_CLIENT_SECRET: ${{ secrets.ITAD_CLIENT_SECRET }}
