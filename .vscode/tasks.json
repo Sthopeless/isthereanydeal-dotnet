@@ -1,0 +1,115 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/IsThereAnyDeal.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/IsThereAnyDeal.sln",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/IsThereAnyDealApi/IsThereAnyDealApi.csproj",
+                "--configuration",
+                "Release",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Publish NuGet Package",
+            "type": "shell",
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+            },
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Build Release (IsThereAnyDealApi)",
+                "Pack NuGet Package (IsThereAnyDealApi)",
+                "Push NuGet Package (IsThereAnyDealApi)"
+            ],
+             "group": "none"
+        },
+        {
+            "label": "Build Release (IsThereAnyDealApi)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceFolder}/IsThereAnyDealApi/IsThereAnyDealApi.csproj",
+                "--configuration",
+                "Release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Pack NuGet Package (IsThereAnyDealApi)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "pack",
+                "${workspaceFolder}/IsThereAnyDealApi/IsThereAnyDealApi.csproj",
+                "--configuration",
+                "Release",
+                "--no-build",
+                "/p:IncludeSymbols=true",
+                "/p:SymbolPackageFormat=snupkg"
+            ],
+            "problemMatcher": []
+        },
+        {
+            // --- Helper Task: Push Package to NuGet ---
+           "label": "Push NuGet Package (IsThereAnyDealApi)",
+           "type": "shell", // Keep as shell to execute PowerShell commands
+           "command": "powershell", // Explicitly use PowerShell
+           "args": [
+               "-Command",
+               "$nupkgPath = (Get-ChildItem -Path '${workspaceFolder}/IsThereAnyDealApi/bin/Release' -Filter *.nupkg | Select-Object -First 1).FullName; if ($null -ne $nupkgPath) { dotnet nuget push $nupkgPath --source https://api.nuget.org/v3/index.json --api-key '${input:nugetKey}' --skip-duplicate } else { Write-Error 'Failed to find .nupkg file in bin/Release' }"
+           ],
+           "problemMatcher": [], // No standard problem matcher for this script
+           // No cwd needed here as we use ${workspaceFolder} in the PowerShell command
+       }
+    ],
+    "inputs": [
+        {
+            "id": "nugetKey",
+            "type": "promptString",
+            "description": "Enter NuGet.org API Key",
+            "password": true
+        }
+    ]
+}

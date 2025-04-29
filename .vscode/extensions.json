@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "ms-dotnettools.csdevkit",
+        "jmrog.vscode-nuget-package-manager",
+        "eamodio.gitlens"
+    ]
+}
