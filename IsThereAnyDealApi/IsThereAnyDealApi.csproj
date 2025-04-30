@@ -6,12 +6,12 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
 
-    <PackageId>IsThereAnyDealApi</PackageId> <Version>1.0.2</Version> <Authors>Sthope</Authors>
+    <PackageId>IsThereAnyDealApi</PackageId> <Version>1.0.3</Version> <Authors>Sthope</Authors>
     <Company>Sthope</Company>
     <Product>IsThereAnyDeal API Client</Product>
     <Description>A .NET client library for interacting with the IsThereAnyDeal API (v2). Provides access to game lookups, price information, deals, bundles, user waitlists, collections, and more. See project URL for documentation and examples.</Description>
-    <PackageProjectUrl>https://github.com/sthopeless/isthereanydeal-dotnet</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/sthopeless/isthereanydeal-dotnet.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/GamarrDev/isthereanydeal-dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/GamarrDev/isthereanydeal-dotnet.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>isthereanydeal itad api client wrapper rest game deals prices wishlist collection gaming RestEase</PackageTags> <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile> <IncludeSymbols>true</IncludeSymbols>
