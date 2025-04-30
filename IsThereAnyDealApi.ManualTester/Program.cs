@@ -35,6 +35,7 @@ class Program
 
     static async Task Main(string[] args)
     {
+        Console.WriteLine("=================================");
         Console.WriteLine("IsThereAnyDeal API Manual Tester");
         Console.WriteLine("=================================");
 
@@ -93,7 +94,7 @@ class Program
 
             _client = new IsThereAnyDealApiClient(_apiKey);
             Console.WriteLine("API Client Initialized (API Key loaded).");
-            Console.WriteLine($"OAuth Client ID: {_clientId}"); // Don't print secret
+            // Console.WriteLine($"OAuth Client ID: {_clientId}"); // Don't print secret
             return true;
         }
         catch (Exception ex)
